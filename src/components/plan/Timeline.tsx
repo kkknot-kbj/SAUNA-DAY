@@ -21,12 +21,20 @@ type TimelineRow = {
   missing?: boolean;
 };
 
+/** HH:mm:ss を HH:mm に正規化。HH:mm ならそのまま返す */
+function normalizeTime(time: string | null): string | null {
+  if (time === null) return null;
+  // HH:mm:ss → HH:mm
+  const match = time.match(/^(\d{2}:\d{2})/);
+  return match ? match[1] : time;
+}
+
 /** 解決済みのプラン項目を表示行に変換する */
 export function toTimelineRow(item: ResolvedPlanItem): TimelineRow {
   if (item.place === null) {
     // 推測で補完しない（要件14-7）
     return {
-      time: item.startTime,
+      time: normalizeTime(item.startTime),
       title: '情報が取得できません',
       meta: null,
       icon: 'CircleHelp',
@@ -39,7 +47,7 @@ export function toTimelineRow(item: ResolvedPlanItem): TimelineRow {
   switch (item.place.kind) {
     case 'sauna':
       return {
-        time: item.startTime,
+        time: normalizeTime(item.startTime),
         title: item.place.value.name,
         meta: item.note,
         icon,
@@ -47,15 +55,15 @@ export function toTimelineRow(item: ResolvedPlanItem): TimelineRow {
       };
     case 'restaurant':
       return {
-        time: item.startTime,
+        time: normalizeTime(item.startTime),
         title: item.place.value.name,
         meta: item.place.value.genre,
         icon,
       };
     case 'spot':
-      return { time: item.startTime, title: item.place.value.name, meta: item.note, icon };
+      return { time: normalizeTime(item.startTime), title: item.place.value.name, meta: item.note, icon };
     case 'hotel':
-      return { time: item.startTime, title: item.place.value.name, meta: item.note, icon };
+      return { time: normalizeTime(item.startTime), title: item.place.value.name, meta: item.note, icon };
   }
 }
 

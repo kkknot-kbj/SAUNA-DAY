@@ -62,6 +62,10 @@ export type SaunaSummary = {
   priceMin: number | null;
   /** 出発地からの導出値。null は「不明」 */
   travelMinutes: number | null;
+  /** 今月のおすすめ表示期限。null = 非掲載 */
+  featuredUntil: string | null;
+  /** おすすめカード内のキャッチコピー */
+  featuredCopy: string | null;
 };
 
 /** 詳細画面で表示する全項目 */

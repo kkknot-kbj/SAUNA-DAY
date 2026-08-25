@@ -24,6 +24,10 @@ export type RequiredConditions = {
   budgetMax: number | null;
   /** 貸切等、満たさなければ除外する絶対条件 */
   absoluteTags: TagRef[];
+  /** エリアキー。空配列 = エリア制約なし */
+  areaKeys: string[];
+  /** 行ったことがあるサウナ（お気に入り済み）を除外するか */
+  excludeVisited: boolean;
 };
 
 /**
@@ -50,6 +54,8 @@ export const EMPTY_CONDITIONS: SearchConditions = {
     stayType: null,
     budgetMax: null,
     absoluteTags: [],
+    areaKeys: [],
+    excludeVisited: false,
   },
   wish: { tags: [] },
 };
@@ -60,4 +66,12 @@ export type Origin = {
   labelJa: string;
   lat: number;
   lng: number;
+};
+
+/** 保存した検索条件 */
+export type SavedCondition = {
+  id: string;
+  label: string;
+  conditions: SearchConditions;
+  createdAt: string;
 };

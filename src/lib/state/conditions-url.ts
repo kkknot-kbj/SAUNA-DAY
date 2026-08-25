@@ -57,6 +57,12 @@ function parseDate(value: string | null): string | null {
   return Number.isNaN(new Date(`${value}T00:00:00`).getTime()) ? null : value;
 }
 
+/** カンマ区切りのエリアキーを配列に。空は空配列 */
+function parseAreaKeys(value: string | null): string[] {
+  if (value === null || value === '') return [];
+  return value.split(',').filter((k) => k.length > 0);
+}
+
 type QueryInput = Record<string, string | string[] | undefined>;
 
 function pick(query: QueryInput, key: string): string | null {
@@ -82,6 +88,8 @@ export function conditionsFromQuery(query: QueryInput): SearchConditions {
       stayType: STAY_TYPES.includes(stay as StayType) ? (stay as StayType) : null,
       budgetMax: parseInteger(pick(query, KEYS.budget)),
       absoluteTags: parseTags(pick(query, KEYS.absolute)),
+      areaKeys: parseAreaKeys(pick(query, 'area')),
+      excludeVisited: pick(query, 'exv') === '1',
     },
     wish: { tags: parseTags(pick(query, KEYS.wish)) },
   };
@@ -103,6 +111,12 @@ export function conditionsToQuery(conditions: SearchConditions): URLSearchParams
   if (required.budgetMax !== null) params.set(KEYS.budget, String(required.budgetMax));
   if (required.absoluteTags.length > 0) {
     params.set(KEYS.absolute, serializeTags(required.absoluteTags));
+  }
+  if (required.areaKeys.length > 0) {
+    params.set('area', required.areaKeys.join(','));
+  }
+  if (required.excludeVisited) {
+    params.set('exv', '1');
   }
   if (wish.tags.length > 0) params.set(KEYS.wish, serializeTags(wish.tags));
 

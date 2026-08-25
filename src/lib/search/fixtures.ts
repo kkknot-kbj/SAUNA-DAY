@@ -45,6 +45,8 @@ export function makeSauna(overrides: Partial<SaunaDetail> & { id: string }): Sau
     experiences: [],
     popularityScore: 0,
     travelMinutes: null,
+    featuredUntil: null,
+    featuredCopy: null,
   };
 
   return { ...base, ...overrides };

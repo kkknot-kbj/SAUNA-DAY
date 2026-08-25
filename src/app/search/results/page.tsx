@@ -86,6 +86,15 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
                     originLabel={originLabel}
                     priority={index === 0}
                   />
+                  {index === 0 && item.score.conditionMatch.matched.length > 0 ? (
+                    <p className="text-[13px] text-ink-muted">
+                      {item.score.conditionMatch.matched
+                        .slice(0, 3)
+                        .map((ref) => labelOf(ref))
+                        .join('・')}
+                      に一致
+                    </p>
+                  ) : null}
                   <WhyRanked score={item.score} mustTags={mustTags} />
                 </li>
               ))}

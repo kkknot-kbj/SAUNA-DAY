@@ -2,6 +2,7 @@ import type {
   HolidayPlan,
   LinkedPlaces,
   Origin,
+  SavedCondition,
   SaunaDetail,
   SaunaSummary,
   SearchConditions,
@@ -54,6 +55,21 @@ export type Repository = {
   getSavedPlan(id: string): Promise<HolidayPlan | null>;
   savePlan(plan: HolidayPlan): Promise<string>;
   deletePlan(id: string): Promise<void>;
+
+  // ── 今月のおすすめ（Sprint 2）
+  /** featured_until が今日以降の施設を最大3件返す */
+  listFeaturedSaunas(): Promise<SaunaSummary[]>;
+
+  // ── プラン共有（Sprint 2）
+  /** is_public = true のプランを認証不要で取得する */
+  getPublicPlan(id: string): Promise<HolidayPlan | null>;
+  /** プランの公開状態を変更する */
+  setPublicPlan(id: string, isPublic: boolean): Promise<void>;
+
+  // ── 検索条件の保存（Sprint 2）
+  listSavedConditions(): Promise<SavedCondition[]>;
+  saveCondition(label: string, conditions: SearchConditions): Promise<string>;
+  deleteCondition(id: string): Promise<void>;
 };
 
 /** Phase 3 / 6 で実装するメソッドの暫定エラー */

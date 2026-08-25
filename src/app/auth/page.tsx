@@ -1,6 +1,11 @@
+import { redirect } from 'next/navigation';
+
 import { AppHeader } from '@/components/layout/AppHeader';
 import { PageShell } from '@/components/layout/PageShell';
-import { Button, LinkButton } from '@/components/ui/Button';
+import { LinkButton } from '@/components/ui/Button';
+import { createClient } from '@/lib/supabase/server';
+
+import { AuthButtons } from './AuthButtons';
 
 type AuthPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -11,16 +16,23 @@ type AuthPageProps = {
  *
  * IMPORTANT: 認証手段は Apple と Google の2つのみ。
  * メールアドレス・パスワード入力は MVP では提供しない（要件15-3）。
- *
- * 実際のサインインは Phase 4 で Supabase Auth に接続する。
+ * 既にログイン済みなら next へ直接遷移する。
  */
 export default async function AuthPage({ searchParams }: AuthPageProps) {
   const query = await searchParams;
   const nextParam = query.next;
   const next = Array.isArray(nextParam) ? nextParam[0] : nextParam;
+  const redirectTo = next ?? '/';
+
+  // 既に認証済みなら next へ飛ばす
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    redirect(redirectTo);
+  }
 
   // 認証を中断してもゲストとして続けられるようにする（要件15-6）
-  const cancelHref = next ?? '/';
+  const cancelHref = redirectTo;
 
   return (
     <>
@@ -36,18 +48,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
             </p>
           </div>
 
-          {/*
-            Apple / Google はサインインボタンに公式マークの使用を求めているため、
-            汎用アイコンで代用しない。Phase 4 で公式アセットを入れる。
-          */}
-          <div className="flex flex-col gap-3">
-            <Button variant="secondary" block>
-              Appleで続ける
-            </Button>
-            <Button variant="secondary" block>
-              Googleで続ける
-            </Button>
-          </div>
+          <AuthButtons redirectTo={redirectTo} />
 
           <div className="flex flex-col gap-4">
             <LinkButton href={cancelHref} variant="quiet" block>

@@ -53,6 +53,10 @@ export function SaunaCard({ sauna, score, originLabel, priority = false }: Sauna
           {sauna.name}
         </h3>
 
+        <p className="text-[13px] text-ink-faint">
+          {sauna.prefecture}{sauna.area !== null ? ` ${sauna.area}` : ''}
+        </p>
+
         <TagRow items={tags} />
 
         <div className="flex flex-col gap-1 pt-1">

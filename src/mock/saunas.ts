@@ -36,6 +36,8 @@ export const MOCK_SAUNAS: readonly MockSauna[] = [
     reservationUrl: 'https://example.com/okutama-kawabe/reserve',
     officialUrl: 'https://example.com/okutama-kawabe',
     popularityScore: 0.82,
+    featuredUntil: '2026-09-30',
+    featuredCopy: '渓流に飛び込む、夏の最高体験',
     primaryTags: [tag('cooldown', 'river'), tag('heat_source', 'wood'), tag('privacy', 'time_private')],
     features: [
       tag('sauna_type', 'tent'),
@@ -727,6 +729,8 @@ export const MOCK_SAUNAS: readonly MockSauna[] = [
     officialUrl: 'https://example.com/nasu-snow',
     supportsLodging: true,
     popularityScore: 0.85,
+    featuredUntil: '2026-09-30',
+    featuredCopy: '高原の静寂で深く整う',
     primaryTags: [tag('experience', 'snow_dive'), tag('environment', 'mountain'), tag('heat_source', 'wood')],
     features: [
       tag('sauna_type', 'hut'),
@@ -884,6 +888,8 @@ export const MOCK_SAUNAS: readonly MockSauna[] = [
     reservationUrl: 'https://example.com/minakami-dive/reserve',
     officialUrl: 'https://example.com/minakami-dive',
     supportsLodging: true,
+    featuredUntil: '2026-09-30',
+    featuredCopy: '渓流ダイブと雪ダイブ、季節で変わる冷',
     popularityScore: 0.89,
     primaryTags: [tag('experience', 'river_dive'), tag('cooldown', 'snow'), tag('heat_source', 'wood')],
     features: [

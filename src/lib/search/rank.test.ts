@@ -24,6 +24,8 @@ function item(id: string, total: number): SearchResultItem {
       primaryTags: [],
       priceMin: null,
       travelMinutes: null,
+      featuredUntil: null,
+      featuredCopy: null,
     },
     score,
   };

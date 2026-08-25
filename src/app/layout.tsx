@@ -1,4 +1,6 @@
+import { AuthSync } from '@/components/layout/AuthSync';
 import { BottomNav } from '@/components/layout/BottomNav';
+import { createClient } from '@/lib/supabase/server';
 
 import './globals.css';
 
@@ -29,7 +31,11 @@ export const viewport: Viewport = {
 const FONT_HREF =
   'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;600&display=swap';
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const isAuthenticated = user !== null;
+
   return (
     <html lang="ja" className="h-full antialiased">
       <head>
@@ -38,6 +44,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="stylesheet" href={FONT_HREF} />
       </head>
       <body className="flex min-h-full flex-col bg-surface text-ink">
+        <AuthSync isAuthenticated={isAuthenticated} />
         {children}
         <BottomNav />
       </body>

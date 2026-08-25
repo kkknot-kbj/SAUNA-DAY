@@ -14,6 +14,7 @@ export type {
   WishConditions,
   SearchConditions,
   Origin,
+  SavedCondition,
 } from './conditions';
 export { EMPTY_CONDITIONS } from './conditions';
 

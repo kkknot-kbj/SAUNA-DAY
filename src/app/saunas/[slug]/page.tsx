@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 
+import { listFavoriteIds } from '@/app/actions';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { PageShell } from '@/components/layout/PageShell';
 import { CooldownList } from '@/components/sauna/CooldownList';
@@ -13,6 +14,7 @@ import { Icon } from '@/components/ui/Icon';
 import { Photo } from '@/components/ui/Photo';
 import { Stat, StatList } from '@/components/ui/Stat';
 import { getRepository } from '@/lib/data';
+import { createClient } from '@/lib/supabase/server';
 import {
   formatBusinessHours,
   formatCapacity,
@@ -22,6 +24,7 @@ import {
 
 type SaunaPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 /**
@@ -31,19 +34,32 @@ type SaunaPageProps = {
  * IMPORTANT: 不明な項目は「不明」と表示する。推測値を出さない。
  * 予約URLがない施設では遷移手段を出さない（要件17-4）。
  */
-export default async function SaunaPage({ params }: SaunaPageProps) {
+export default async function SaunaPage({ params, searchParams }: SaunaPageProps) {
   const { slug } = await params;
+  const query = await searchParams;
+
+  // 遷移元に応じた「戻る」先。デフォルトは検索結果
+  const fromParam = typeof query.from === 'string' ? query.from : null;
+  const backHref = fromParam ?? '/search/results';
 
   const repository = getRepository();
   const sauna = await repository.getSaunaBySlug(slug);
   if (sauna === null) notFound();
 
-  const places = await repository.getLinkedPlaces(sauna.id);
+  const [places, favoriteIds, supabase] = await Promise.all([
+    repository.getLinkedPlaces(sauna.id),
+    listFavoriteIds(),
+    createClient(),
+  ]);
+
+  const { data: { user } } = await supabase.auth.getUser();
+  const isAuthenticated = user !== null;
+  const isFavorite = favoriteIds.includes(sauna.id);
   const hours = formatBusinessHours(sauna.businessHours);
 
   return (
     <>
-      <AppHeader backHref="/search/results" />
+      <AppHeader backHref={backHref} />
       <TrackView slug={slug} />
 
       <PageShell bleed>
@@ -75,7 +91,12 @@ export default async function SaunaPage({ params }: SaunaPageProps) {
               <Icon name="Route" size={20} />
               このサウナで休日を作る
             </LinkButton>
-            <FavoriteButton slug={sauna.slug} />
+            <FavoriteButton
+              slug={sauna.slug}
+              saunaId={sauna.id}
+              isFavorite={isFavorite}
+              isAuthenticated={isAuthenticated}
+            />
           </div>
 
           {/* 基本情報 */}

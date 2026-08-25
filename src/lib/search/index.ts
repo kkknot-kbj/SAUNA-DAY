@@ -40,6 +40,8 @@ function toSummary(sauna: SaunaDetail): SaunaSummary {
     primaryTags: sauna.primaryTags,
     priceMin: sauna.priceMin,
     travelMinutes: sauna.travelMinutes,
+    featuredUntil: sauna.featuredUntil,
+    featuredCopy: sauna.featuredCopy,
   };
 }
 

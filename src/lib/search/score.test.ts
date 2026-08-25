@@ -249,6 +249,8 @@ describe('score — スコア計算（要件6）', () => {
             primaryTags: [],
             priceMin: sauna.priceMin,
             travelMinutes: sauna.travelMinutes,
+            featuredUntil: null,
+            featuredCopy: null,
           },
           score: calculateScore(sauna, c, context),
         }));

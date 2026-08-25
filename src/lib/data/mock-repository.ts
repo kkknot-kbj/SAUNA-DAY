@@ -11,6 +11,7 @@ import type {
   HolidayPlan,
   LinkedPlaces,
   Origin,
+  SavedCondition,
   SaunaDetail,
   SaunaSummary,
   SearchConditions,
@@ -43,6 +44,8 @@ function toSummary(sauna: SaunaDetail): SaunaSummary {
     primaryTags: sauna.primaryTags,
     priceMin: sauna.priceMin,
     travelMinutes: sauna.travelMinutes,
+    featuredUntil: sauna.featuredUntil,
+    featuredCopy: sauna.featuredCopy,
   };
 }
 
@@ -126,5 +129,48 @@ export const mockRepository: Repository = {
 
   async deletePlan(): Promise<void> {
     throw new NotImplementedYetError('deletePlan', 'Phase 6');
+  },
+
+  // ── 今月のおすすめ（Sprint 2）
+  async listFeaturedSaunas(): Promise<SaunaSummary[]> {
+    const today = new Date().toISOString().slice(0, 10);
+    const featured = MOCK_SAUNAS.filter(
+      (s) => s.featuredUntil !== undefined && s.featuredUntil !== null && s.featuredUntil >= today,
+    );
+    return featured.slice(0, 3).map((s) => ({
+      id: s.id,
+      slug: s.slug,
+      name: s.name,
+      prefecture: s.prefecture,
+      area: s.area,
+      heroImage: s.heroImage ?? null,
+      primaryTags: s.primaryTags,
+      priceMin: s.priceMin,
+      travelMinutes: null,
+      featuredUntil: s.featuredUntil ?? null,
+      featuredCopy: s.featuredCopy ?? null,
+    }));
+  },
+
+  // ── プラン共有（Sprint 2）
+  async getPublicPlan(): Promise<HolidayPlan | null> {
+    return null;
+  },
+
+  async setPublicPlan(): Promise<void> {
+    // mock: no-op
+  },
+
+  // ── 検索条件の保存（Sprint 2）
+  async listSavedConditions(): Promise<SavedCondition[]> {
+    return [];
+  },
+
+  async saveCondition(): Promise<string> {
+    return 'mock-condition-id';
+  },
+
+  async deleteCondition(): Promise<void> {
+    // mock: no-op
   },
 };

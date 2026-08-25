@@ -27,7 +27,7 @@ export function Icon({ name, size = 20, className }: IconProps) {
   const Component = REGISTRY[name];
 
   // 未登録のアイコン名でも画面を壊さない
-  if (typeof Component !== 'function') {
+  if (Component == null) {
     return <lucide.Tag size={size} strokeWidth={1.5} className={className} aria-hidden />;
   }
 

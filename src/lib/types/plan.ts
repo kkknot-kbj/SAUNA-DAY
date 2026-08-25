@@ -38,6 +38,8 @@ export type HolidayPlan = {
 
 /** AI に返させる出力。これ以外のフィールドを受け付けない */
 export type PlanOutput = {
+  /** プランの概要を表す一言（20文字以内）。例: 「渓流サウナと山の幸を味わう休日」 */
+  title: string;
   items: PlanItem[];
 };
 

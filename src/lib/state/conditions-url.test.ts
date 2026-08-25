@@ -21,6 +21,8 @@ const FULL: SearchConditions = {
     stayType: 'day_trip',
     budgetMax: 8000,
     absoluteTags: [{ category: 'privacy', key: 'full_private' }],
+    areaKeys: [],
+    excludeVisited: false,
   },
   wish: {
     tags: [

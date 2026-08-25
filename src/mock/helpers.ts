@@ -110,6 +110,8 @@ export function defineSauna(input: SaunaInput): MockSauna {
     supportsLodging: false,
     heroImage: { url: null, alt },
     images: [{ url: null, alt }],
+    featuredUntil: null,
+    featuredCopy: null,
     ...input,
   };
 }
