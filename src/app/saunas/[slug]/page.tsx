@@ -9,6 +9,7 @@ import { CooldownList } from '@/components/sauna/CooldownList';
 import { EnvironmentList } from '@/components/sauna/EnvironmentList';
 import { FavoriteButton } from '@/components/sauna/FavoriteButton';
 import { LinkedPlaceList } from '@/components/sauna/LinkedPlaceList';
+import { SaunaSpec } from '@/components/sauna/SaunaSpec';
 import { TagSection } from '@/components/sauna/TagSection';
 import { TrackView } from '@/components/sauna/TrackView';
 import { LinkButton } from '@/components/ui/Button';
@@ -136,10 +137,16 @@ export default async function SaunaPage({ params, searchParams }: SaunaPageProps
                   label: 'サウナ',
                   content: (
                     <div className="flex flex-col gap-8">
-                      {/* サウナ本体 */}
+                      {/* 主要スペック（タイプ・熱源・温度ゲージ） */}
+                      <SaunaSpec
+                        tempMin={sauna.tempMin}
+                        tempMax={sauna.tempMax}
+                        features={sauna.features}
+                        cooldowns={sauna.cooldowns}
+                      />
+
+                      {/* サウナ設備 */}
                       <section className="flex flex-col gap-6">
-                        <TagSection category="sauna_type" tags={sauna.features} />
-                        <TagSection category="heat_source" tags={sauna.features} />
                         <TagSection category="equipment" tags={sauna.features} />
                       </section>
 
