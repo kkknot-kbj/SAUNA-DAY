@@ -26,6 +26,8 @@ function item(id: string, total: number): SearchResultItem {
       travelMinutes: null,
       featuredUntil: null,
       featuredCopy: null,
+      saunaTempMax: null,
+      coolTempMin: null,
     },
     score,
   };

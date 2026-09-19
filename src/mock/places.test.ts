@@ -31,11 +31,9 @@ describe('周辺施設のモックデータ（要件11・20-9）', () => {
     expect(withoutHotels.length).toBeGreaterThan(0);
   });
 
-  it('宿泊対応のサウナには必ず宿泊候補がある', () => {
-    for (const sauna of MOCK_SAUNAS.filter((s) => s.supportsLodging)) {
-      expect(linkedPlacesOf(sauna.id).hotels.length, sauna.slug).toBeGreaterThan(0);
-    }
-  });
+  // 注: 「サウナ付き一棟貸し」への転換により、施設自体が宿泊先となった。
+  // 宿泊対応の施設が別の宿泊候補(hotels)を持つ必要はなくなったため、
+  // 旧モデルの「宿泊対応サウナには宿泊候補が必須」テストは削除した。
 
   it('温泉カテゴリのスポットが存在する（プランに温泉を含められる）', () => {
     expect(MOCK_SPOTS.some((s) => s.category === 'onsen')).toBe(true);

@@ -132,10 +132,22 @@ function buildSaunaDetail(
     travelMinutes,
     featuredUntil: (row as Record<string, unknown>).featured_until as string | null ?? null,
     featuredCopy: (row as Record<string, unknown>).featured_copy as string | null ?? null,
+    // 宿泊・BBQ 情報は Sprint の DB マイグレーション後に対応。現状は null
+    lodging: null,
+    bbq: null,
+    // カード表示用の導出値。toSummary で計算し直すため詳細では暫定値
+    saunaTempMax: row.temp_max,
+    coolTempMin: cooldowns.map((c) => c.water_temp_min).filter((t): t is number => t !== null).length === 0
+      ? null
+      : Math.min(...cooldowns.map((c) => c.water_temp_min).filter((t): t is number => t !== null)),
   };
 }
 
 function toSummary(sauna: SaunaDetail): SaunaSummary {
+  const coolTemps = sauna.cooldowns
+    .map((c) => c.waterTempMin)
+    .filter((t): t is number => t !== null);
+
   return {
     id: sauna.id,
     slug: sauna.slug,
@@ -148,6 +160,8 @@ function toSummary(sauna: SaunaDetail): SaunaSummary {
     travelMinutes: sauna.travelMinutes,
     featuredUntil: sauna.featuredUntil,
     featuredCopy: sauna.featuredCopy,
+    saunaTempMax: sauna.tempMax,
+    coolTempMin: coolTemps.length === 0 ? null : Math.min(...coolTemps),
   };
 }
 

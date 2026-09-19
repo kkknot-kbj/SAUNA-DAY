@@ -1,4 +1,4 @@
-import { cool, defineSauna, env, everyday, tag, withClosed } from './helpers';
+import { bbq, cool, defineSauna, env, everyday, lodging, tag, withClosed } from './helpers';
 
 import type { MockSauna } from './helpers';
 
@@ -109,6 +109,15 @@ export const MOCK_SAUNAS: readonly MockSauna[] = [
       cool({ key: 'barrel', depthCm: 90, canDive: false, isNatural: true, hasFlow: false }),
     ],
     experiences: [tag('experience', 'self_loyly'), tag('experience', 'wood_firing'), tag('experience', 'bonfire')],
+    lodging: lodging({
+      checkIn: '15:00',
+      checkOut: '10:00',
+      selfCheckIn: true,
+      maxGuests: 4,
+      stayNote: '1泊〜',
+      amenityKeys: ['wifi', 'kitchen', 'fridge', 'aircon', 'parking', 'towel'],
+    }),
+    bbq: bbq({ roofed: true, equipmentRental: true, ingredientsByoOk: true, note: '屋根付きウッドデッキ。炭は無料' }),
   }),
 
   defineSauna({
@@ -209,6 +218,15 @@ export const MOCK_SAUNAS: readonly MockSauna[] = [
       cool({ key: 'ground_water', tempMin: 14, tempMax: 16, depthCm: 100, canDive: false, isNatural: true, hasFlow: true }),
     ],
     experiences: [tag('experience', 'sunset'), tag('experience', 'morning_sauna'), tag('experience', 'starry_outdoor_bath')],
+    lodging: lodging({
+      checkIn: '15:00',
+      checkOut: '11:00',
+      selfCheckIn: false,
+      maxGuests: 6,
+      stayNote: '1泊2食付き',
+      amenityKeys: ['wifi', 'kitchen', 'fridge', 'aircon', 'parking', 'bath', 'tv', 'towel'],
+    }),
+    bbq: bbq({ roofed: true, equipmentRental: true, ingredientsByoOk: false, note: 'テラスBBQ。食材はプランに含む' }),
   }),
 
   defineSauna({
@@ -731,6 +749,15 @@ export const MOCK_SAUNAS: readonly MockSauna[] = [
     reservationUrl: 'https://example.com/nasu-snow/reserve',
     officialUrl: 'https://example.com/nasu-snow',
     supportsLodging: true,
+    lodging: lodging({
+      checkIn: '16:00',
+      checkOut: '10:00',
+      selfCheckIn: true,
+      maxGuests: 6,
+      stayNote: '1泊〜',
+      amenityKeys: ['wifi', 'kitchen', 'fridge', 'aircon', 'parking', 'pets', 'tv', 'projector'],
+    }),
+    bbq: bbq({ roofed: true, equipmentRental: true, ingredientsByoOk: true, note: '薪ストーブ横の屋内BBQスペース' }),
     popularityScore: 0.85,
     featuredUntil: '2026-09-30',
     featuredCopy: '高原の静寂で深く整う',
@@ -891,6 +918,15 @@ export const MOCK_SAUNAS: readonly MockSauna[] = [
     reservationUrl: 'https://example.com/minakami-dive/reserve',
     officialUrl: 'https://example.com/minakami-dive',
     supportsLodging: true,
+    lodging: lodging({
+      checkIn: '15:00',
+      checkOut: '10:00',
+      selfCheckIn: true,
+      maxGuests: 8,
+      stayNote: '1泊〜（連泊割引あり）',
+      amenityKeys: ['wifi', 'kitchen', 'fridge', 'aircon', 'parking', 'washer', 'bbq', 'towel'],
+    }),
+    bbq: bbq({ roofed: false, equipmentRental: true, ingredientsByoOk: true, note: '川沿いのオープンBBQサイト' }),
     featuredUntil: '2026-09-30',
     featuredCopy: '渓流ダイブと雪ダイブ、季節で変わる冷',
     popularityScore: 0.89,

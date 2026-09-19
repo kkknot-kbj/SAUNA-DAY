@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { Icon } from '@/components/ui/Icon';
 import { Photo } from '@/components/ui/Photo';
 import { TagRow } from '@/components/ui/Tag';
 import { iconOf, labelOf } from '@/lib/taxonomy/terms';
@@ -56,6 +57,26 @@ export function SaunaCard({ sauna, score, originLabel, priority = false }: Sauna
         <p className="text-[13px] text-ink-faint">
           {sauna.prefecture}{sauna.area !== null ? ` ${sauna.area}` : ''}
         </p>
+
+        {/* サウナ室温度・水風呂温度を一目で。参考: SaunaTrip のカード */}
+        {sauna.saunaTempMax !== null || sauna.coolTempMin !== null ? (
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5 text-[13px] text-ink-muted">
+              <Icon name="Flame" size={16} className="text-ink-faint" />
+              サウナ
+              <span className="nums text-ink">
+                {sauna.saunaTempMax !== null ? `${sauna.saunaTempMax}℃` : UNKNOWN}
+              </span>
+            </span>
+            <span className="flex items-center gap-1.5 text-[13px] text-ink-muted">
+              <Icon name="Droplet" size={16} className="text-ink-faint" />
+              水風呂
+              <span className="nums text-ink">
+                {sauna.coolTempMin !== null ? `${sauna.coolTempMin}℃` : UNKNOWN}
+              </span>
+            </span>
+          </div>
+        ) : null}
 
         <TagRow items={tags} />
 

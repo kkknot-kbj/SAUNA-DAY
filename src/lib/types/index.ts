@@ -26,6 +26,9 @@ export type {
   SaunaEnvironment,
   SaunaSummary,
   SaunaDetail,
+  LodgingInfo,
+  Amenity,
+  BbqInfo,
 } from './sauna';
 
 export type {

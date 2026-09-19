@@ -30,6 +30,10 @@ export { collectTagIds, countMatchedTags, hasAllTags, hasTag } from './tags';
 
 /** 詳細から検索結果カード用の情報だけを取り出す */
 function toSummary(sauna: SaunaDetail): SaunaSummary {
+  const coolTemps = sauna.cooldowns
+    .map((c) => c.waterTempMin)
+    .filter((t): t is number => t !== null);
+
   return {
     id: sauna.id,
     slug: sauna.slug,
@@ -42,6 +46,8 @@ function toSummary(sauna: SaunaDetail): SaunaSummary {
     travelMinutes: sauna.travelMinutes,
     featuredUntil: sauna.featuredUntil,
     featuredCopy: sauna.featuredCopy,
+    saunaTempMax: sauna.tempMax,
+    coolTempMin: coolTemps.length === 0 ? null : Math.min(...coolTemps),
   };
 }
 

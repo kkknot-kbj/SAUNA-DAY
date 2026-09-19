@@ -46,7 +46,17 @@ function toSummary(sauna: SaunaDetail): SaunaSummary {
     travelMinutes: sauna.travelMinutes,
     featuredUntil: sauna.featuredUntil,
     featuredCopy: sauna.featuredCopy,
+    saunaTempMax: sauna.tempMax,
+    coolTempMin: coldestCooldownTemp(sauna),
   };
+}
+
+/** 最も冷たいクールダウンの水温を返す。水温不明なら null */
+function coldestCooldownTemp(sauna: SaunaDetail): number | null {
+  const temps = sauna.cooldowns
+    .map((c) => c.waterTempMin)
+    .filter((t): t is number => t !== null);
+  return temps.length === 0 ? null : Math.min(...temps);
 }
 
 export const mockRepository: Repository = {
@@ -135,21 +145,9 @@ export const mockRepository: Repository = {
   async listFeaturedSaunas(): Promise<SaunaSummary[]> {
     const today = new Date().toISOString().slice(0, 10);
     const featured = MOCK_SAUNAS.filter(
-      (s) => s.featuredUntil !== undefined && s.featuredUntil !== null && s.featuredUntil >= today,
+      (s) => s.featuredUntil !== null && s.featuredUntil >= today,
     );
-    return featured.slice(0, 3).map((s) => ({
-      id: s.id,
-      slug: s.slug,
-      name: s.name,
-      prefecture: s.prefecture,
-      area: s.area,
-      heroImage: s.heroImage ?? null,
-      primaryTags: s.primaryTags,
-      priceMin: s.priceMin,
-      travelMinutes: null,
-      featuredUntil: s.featuredUntil ?? null,
-      featuredCopy: s.featuredCopy ?? null,
-    }));
+    return featured.slice(0, 3).map((s) => toSummary({ ...s, travelMinutes: null }));
   },
 
   // ── プラン共有（Sprint 2）

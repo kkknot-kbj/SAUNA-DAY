@@ -251,6 +251,8 @@ describe('score — スコア計算（要件6）', () => {
             travelMinutes: sauna.travelMinutes,
             featuredUntil: null,
             featuredCopy: null,
+            saunaTempMax: null,
+            coolTempMin: null,
           },
           score: calculateScore(sauna, c, context),
         }));

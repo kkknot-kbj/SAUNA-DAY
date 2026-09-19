@@ -1,7 +1,10 @@
 import type {
+  Amenity,
+  BbqInfo,
   BusinessHours,
   Cooldown,
   DayHours,
+  LodgingInfo,
   SaunaDetail,
   SaunaEnvironment,
   TagRef,
@@ -108,10 +111,76 @@ export function defineSauna(input: SaunaInput): MockSauna {
     phone: null,
     supportsDayTrip: false,
     supportsLodging: true,
+    lodging: null,
+    bbq: null,
     heroImage: { url: null, alt },
     images: [{ url: null, alt }],
     featuredUntil: null,
     featuredCopy: null,
+    saunaTempMax: input.tempMax ?? null,
+    coolTempMin: null,
     ...input,
+  };
+}
+
+/** よく使うアメニティの定義。key と lucide アイコンを対応させる */
+const AMENITY_DEFS: Record<string, { label: string; icon: string }> = {
+  wifi: { label: 'Wi-Fi', icon: 'Wifi' },
+  kitchen: { label: 'キッチン', icon: 'CookingPot' },
+  fridge: { label: '冷蔵庫', icon: 'Refrigerator' },
+  aircon: { label: '冷暖房', icon: 'AirVent' },
+  parking: { label: '駐車場', icon: 'CircleParking' },
+  pets: { label: 'ペット可', icon: 'PawPrint' },
+  washer: { label: '洗濯機', icon: 'WashingMachine' },
+  tv: { label: 'テレビ', icon: 'Tv' },
+  bath: { label: '内風呂', icon: 'Bath' },
+  towel: { label: 'タオル', icon: 'Shirt' },
+  bbq: { label: 'BBQ', icon: 'Flame' },
+  projector: { label: 'プロジェクター', icon: 'Projector' },
+};
+
+/** アメニティの key 配列から Amenity[] を組み立てる。未定義キーは無視 */
+export function amenities(keys: string[]): Amenity[] {
+  return keys.flatMap((key): Amenity[] => {
+    const def = AMENITY_DEFS[key];
+    return def === undefined ? [] : [{ key, label: def.label, icon: def.icon }];
+  });
+}
+
+type LodgingInput = {
+  checkIn?: string | null;
+  checkOut?: string | null;
+  selfCheckIn?: boolean | null;
+  maxGuests?: number | null;
+  stayNote?: string | null;
+  amenityKeys?: string[];
+};
+
+/** 宿泊情報。省略した属性は null（不明）になる */
+export function lodging(input: LodgingInput): LodgingInfo {
+  return {
+    checkIn: input.checkIn ?? null,
+    checkOut: input.checkOut ?? null,
+    selfCheckIn: input.selfCheckIn ?? null,
+    maxGuests: input.maxGuests ?? null,
+    stayNote: input.stayNote ?? null,
+    amenities: amenities(input.amenityKeys ?? []),
+  };
+}
+
+type BbqInput = {
+  roofed?: boolean | null;
+  equipmentRental?: boolean | null;
+  ingredientsByoOk?: boolean | null;
+  note?: string | null;
+};
+
+/** BBQ 情報。省略した属性は null（不明）になる */
+export function bbq(input: BbqInput): BbqInfo {
+  return {
+    roofed: input.roofed ?? null,
+    equipmentRental: input.equipmentRental ?? null,
+    ingredientsByoOk: input.ingredientsByoOk ?? null,
+    note: input.note ?? null,
   };
 }

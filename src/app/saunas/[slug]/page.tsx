@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { listFavoriteIds } from '@/app/actions';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { PageShell } from '@/components/layout/PageShell';
+import { AmenityList } from '@/components/sauna/AmenityList';
+import { BbqSection } from '@/components/sauna/BbqSection';
 import { CooldownList } from '@/components/sauna/CooldownList';
 import { EnvironmentList } from '@/components/sauna/EnvironmentList';
 import { FavoriteButton } from '@/components/sauna/FavoriteButton';
@@ -13,6 +15,7 @@ import { LinkButton } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { Photo } from '@/components/ui/Photo';
 import { Stat, StatList } from '@/components/ui/Stat';
+import { Tabs } from '@/components/ui/Tabs';
 import { getRepository } from '@/lib/data';
 import { createClient } from '@/lib/supabase/server';
 import {
@@ -56,6 +59,10 @@ export default async function SaunaPage({ params, searchParams }: SaunaPageProps
   const isAuthenticated = user !== null;
   const isFavorite = favoriteIds.includes(sauna.id);
   const hours = formatBusinessHours(sauna.businessHours);
+  const saunaTemp =
+    sauna.tempMin === null && sauna.tempMax === null
+      ? null
+      : formatTempRange(sauna.tempMin, sauna.tempMax);
 
   return (
     <>
@@ -120,91 +127,148 @@ export default async function SaunaPage({ params, searchParams }: SaunaPageProps
             />
           </div>
 
-          {/* 基本情報 */}
-          <section className="flex flex-col gap-3 px-5">
-            <h2 className="text-[15px] text-ink">基本情報</h2>
-            <StatList>
-              <Stat label="料金" value={formatPriceRange(sauna.priceMin, sauna.priceMax)} />
-              {sauna.priceNote !== null ? (
-                <Stat label="料金の補足" value={sauna.priceNote} />
-              ) : null}
-              <Stat label="人数" value={formatCapacity(sauna.capacityMin, sauna.capacityMax)} />
-              <Stat
-                label="サウナ室温度"
-                value={
-                  sauna.tempMin === null && sauna.tempMax === null
-                    ? null
-                    : formatTempRange(sauna.tempMin, sauna.tempMax)
-                }
-              />
-              <Stat label="住所" value={sauna.address} />
-              <Stat label="駐車場" value={sauna.parkingNote} />
-              <Stat label="電話" value={sauna.phone} />
-              <Stat
-                label="利用形態"
-                value={
-                  [
-                    sauna.supportsDayTrip ? '日帰り' : null,
-                    sauna.supportsLodging ? '宿泊' : null,
-                  ]
-                    .filter((value): value is string => value !== null)
-                    .join(' / ') || null
-                }
-              />
-            </StatList>
-          </section>
+          {/* タブで サウナ / BBQ・設備 / 宿泊情報 を切り替える */}
+          <div className="px-5">
+            <Tabs
+              tabs={[
+                {
+                  key: 'sauna',
+                  label: 'サウナ',
+                  content: (
+                    <div className="flex flex-col gap-8">
+                      {/* サウナ本体 */}
+                      <section className="flex flex-col gap-6">
+                        <TagSection category="sauna_type" tags={sauna.features} />
+                        <TagSection category="heat_source" tags={sauna.features} />
+                        <TagSection category="equipment" tags={sauna.features} />
+                      </section>
 
-          {/* 営業時間 */}
-          <section className="flex flex-col gap-3 px-5">
-            <h2 className="text-[15px] text-ink">営業時間</h2>
-            <StatList>
-              {hours.map((row) => (
-                <Stat key={row.label} label={row.label} value={row.value} />
-              ))}
-            </StatList>
-            {sauna.closedNote !== null ? (
-              <p className="text-[13px] text-ink-muted">{sauna.closedNote}</p>
-            ) : null}
-            {sauna.businessHours?.note !== undefined && sauna.businessHours?.note !== null ? (
-              <p className="text-[13px] text-ink-muted">{sauna.businessHours.note}</p>
-            ) : null}
-          </section>
+                      {/* クールダウン。「入れる」もの */}
+                      <section className="flex flex-col gap-3">
+                        <div className="flex items-baseline gap-2">
+                          <h3 className="text-[15px] text-ink">クールダウン</h3>
+                          <span className="text-[12px] text-ink-faint">実際に入れるもの</span>
+                        </div>
+                        <CooldownList cooldowns={sauna.cooldowns} />
+                      </section>
 
-          {/* サウナ */}
-          <section className="flex flex-col gap-6 px-5">
-            <h2 className="text-[15px] text-ink">サウナ</h2>
-            <TagSection category="sauna_type" tags={sauna.features} />
-            <TagSection category="heat_source" tags={sauna.features} />
-            <TagSection category="equipment" tags={sauna.features} />
-          </section>
+                      {/* 環境。「近くにある・見える」もの */}
+                      <section className="flex flex-col gap-3">
+                        <div className="flex items-baseline gap-2">
+                          <h3 className="text-[15px] text-ink">自然環境</h3>
+                          <span className="text-[12px] text-ink-faint">近くにある・見える自然</span>
+                        </div>
+                        <EnvironmentList environments={sauna.environments} />
+                      </section>
 
-          {/* クールダウン。「入れる」もの */}
-          <section className="flex flex-col gap-3 px-5">
-            <div className="flex items-baseline gap-2">
-              <h2 className="text-[15px] text-ink">クールダウン</h2>
-              <span className="text-[12px] text-ink-faint">実際に入れるもの</span>
-            </div>
-            <CooldownList cooldowns={sauna.cooldowns} />
-          </section>
+                      {/* 外気浴・体験 */}
+                      <section className="flex flex-col gap-6">
+                        <TagSection category="outdoor_bath" tags={sauna.features} />
+                        <TagSection category="experience" tags={sauna.experiences} />
+                      </section>
+                    </div>
+                  ),
+                },
+                {
+                  key: 'bbq',
+                  label: 'BBQ・設備',
+                  content: (
+                    <div className="flex flex-col gap-8">
+                      <BbqSection bbq={sauna.bbq} />
 
-          {/* 環境。「近くにある・見える」もの */}
-          <section className="flex flex-col gap-3 px-5">
-            <div className="flex items-baseline gap-2">
-              <h2 className="text-[15px] text-ink">自然環境</h2>
-              <span className="text-[12px] text-ink-faint">近くにある・見える自然</span>
-            </div>
-            <EnvironmentList environments={sauna.environments} />
-          </section>
+                      {/* 宿の設備 */}
+                      <section className="flex flex-col gap-3">
+                        <h3 className="text-[15px] text-ink">設備・アメニティ</h3>
+                        <AmenityList amenities={sauna.lodging?.amenities ?? []} />
+                      </section>
 
-          {/* 外気浴・体験・貸切・利用条件・アクセス */}
-          <section className="flex flex-col gap-6 px-5">
-            <h2 className="text-[15px] text-ink">過ごし方</h2>
-            <TagSection category="outdoor_bath" tags={sauna.features} />
-            <TagSection category="experience" tags={sauna.experiences} />
-            <TagSection category="privacy" tags={sauna.features} title="貸切・プライベート性" />
-            <TagSection category="usage" tags={sauna.features} />
-            <TagSection category="access" tags={sauna.features} />
-          </section>
+                      {/* 貸切・利用条件 */}
+                      <section className="flex flex-col gap-6">
+                        <TagSection
+                          category="privacy"
+                          tags={sauna.features}
+                          title="貸切・プライベート性"
+                        />
+                        <TagSection category="usage" tags={sauna.features} />
+                      </section>
+                    </div>
+                  ),
+                },
+                {
+                  key: 'lodging',
+                  label: '宿泊情報',
+                  content: (
+                    <div className="flex flex-col gap-8">
+                      {/* 宿泊の基本情報 */}
+                      <StatList>
+                        <Stat
+                          label="料金"
+                          value={formatPriceRange(sauna.priceMin, sauna.priceMax)}
+                          note={sauna.priceNote ?? '1棟あたり'}
+                        />
+                        <Stat
+                          label="定員"
+                          value={formatCapacity(sauna.capacityMin, sauna.capacityMax)}
+                        />
+                        {sauna.lodging !== null ? (
+                          <>
+                            <Stat
+                              label="宿泊人数"
+                              value={
+                                sauna.lodging.maxGuests === null
+                                  ? null
+                                  : `最大${sauna.lodging.maxGuests}名`
+                              }
+                            />
+                            <Stat label="チェックイン" value={sauna.lodging.checkIn} />
+                            <Stat label="チェックアウト" value={sauna.lodging.checkOut} />
+                            <Stat
+                              label="セルフチェックイン"
+                              value={
+                                sauna.lodging.selfCheckIn === null
+                                  ? null
+                                  : sauna.lodging.selfCheckIn
+                                    ? '対応'
+                                    : '非対応（対面）'
+                              }
+                            />
+                            {sauna.lodging.stayNote !== null ? (
+                              <Stat label="宿泊の補足" value={sauna.lodging.stayNote} />
+                            ) : null}
+                          </>
+                        ) : null}
+                        <Stat label="サウナ室温度" value={saunaTemp} />
+                        <Stat label="住所" value={sauna.address} />
+                        <Stat label="駐車場" value={sauna.parkingNote} />
+                        <Stat label="電話" value={sauna.phone} />
+                      </StatList>
+
+                      {/* アクセス */}
+                      <section className="flex flex-col gap-3">
+                        <h3 className="text-[15px] text-ink">アクセス</h3>
+                        <TagSection category="access" tags={sauna.features} />
+                      </section>
+
+                      {/* 日帰り施設のときだけ営業時間を出す。宿は営業時間の概念が薄い */}
+                      {sauna.supportsDayTrip && !sauna.supportsLodging ? (
+                        <section className="flex flex-col gap-3">
+                          <h3 className="text-[15px] text-ink">営業時間</h3>
+                          <StatList>
+                            {hours.map((row) => (
+                              <Stat key={row.label} label={row.label} value={row.value} />
+                            ))}
+                          </StatList>
+                          {sauna.closedNote !== null ? (
+                            <p className="text-[13px] text-ink-muted">{sauna.closedNote}</p>
+                          ) : null}
+                        </section>
+                      ) : null}
+                    </div>
+                  ),
+                },
+              ]}
+            />
+          </div>
 
           {/* 周辺施設。サウナ本体より下位の扱い */}
           <div className="px-5">

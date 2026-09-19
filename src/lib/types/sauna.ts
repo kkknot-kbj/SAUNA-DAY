@@ -66,6 +66,53 @@ export type SaunaSummary = {
   featuredUntil: string | null;
   /** おすすめカード内のキャッチコピー */
   featuredCopy: string | null;
+  /** サウナ室温度（カードの一目表示用）。null は「不明」 */
+  saunaTempMax: number | null;
+  /** 主要なクールダウンの水温（カードの一目表示用）。null は「不明」 */
+  coolTempMin: number | null;
+};
+
+/**
+ * 宿泊情報。一棟貸し・貸別荘としての情報。
+ * 日帰り専用施設では null。
+ */
+export type LodgingInfo = {
+  /** チェックイン時刻 HH:mm。不明は null */
+  checkIn: string | null;
+  /** チェックアウト時刻 HH:mm。不明は null */
+  checkOut: string | null;
+  /** セルフチェックインか。不明は null */
+  selfCheckIn: boolean | null;
+  /** 宿泊できる最大人数。不明は null */
+  maxGuests: number | null;
+  /** 最低宿泊数の補足（例「1泊〜」）。不明は null */
+  stayNote: string | null;
+  /** Airbnb 的な設備。key は lucide アイコンに対応させる */
+  amenities: Amenity[];
+};
+
+/** 宿の設備。絵文字は使わず lucide アイコンで表す */
+export type Amenity = {
+  /** 'wifi' | 'kitchen' | 'fridge' | 'parking' | 'pets' 等 */
+  key: string;
+  label: string;
+  /** lucide-react のアイコン名 */
+  icon: string;
+};
+
+/**
+ * BBQ スペースの情報。
+ * BBQ 設備がない施設では null。
+ */
+export type BbqInfo = {
+  /** 屋根付きか。不明は null */
+  roofed: boolean | null;
+  /** 器材レンタルの有無。不明は null */
+  equipmentRental: boolean | null;
+  /** 食材持ち込み可か。不明は null */
+  ingredientsByoOk: boolean | null;
+  /** 補足の一言。事実情報のみ */
+  note: string | null;
 };
 
 /** 詳細画面で表示する全項目 */
@@ -90,6 +137,10 @@ export type SaunaDetail = SaunaSummary & {
   phone: string | null;
   supportsDayTrip: boolean;
   supportsLodging: boolean;
+  /** 宿泊情報。日帰り専用施設は null */
+  lodging: LodgingInfo | null;
+  /** BBQ スペースの情報。BBQ 不可の施設は null */
+  bbq: BbqInfo | null;
   images: SaunaImage[];
   /** タイプ / 熱源 / 設備 / 外気浴 / 貸切 / 利用条件 / アクセス */
   features: TagRef[];
