@@ -80,17 +80,38 @@ export default async function SaunaPage({ params, searchParams }: SaunaPageProps
               {sauna.area !== null ? ` ${sauna.area}` : ''}
             </p>
             <h1 className="font-serif text-[28px] leading-snug text-ink">{sauna.name}</h1>
+
+            {/* 宿泊の要点を一目で。料金は1棟あたり、定員を併記 */}
+            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 pt-1">
+              <span className="nums text-[17px] text-ink">
+                {formatPriceRange(sauna.priceMin, sauna.priceMax)}
+              </span>
+              <span className="text-[13px] text-ink-muted">
+                {sauna.priceNote ?? '1棟あたり'}
+              </span>
+              <span className="text-[13px] text-ink-muted">
+                定員 {formatCapacity(sauna.capacityMin, sauna.capacityMax)}
+              </span>
+            </div>
+
             {sauna.description !== null ? (
               <p className="text-[14px] leading-[1.9] text-ink-muted">{sauna.description}</p>
             ) : null}
           </div>
 
-          {/* 主要なCTA。休日づくりが本命なので primary はこちら */}
+          {/* 主要なCTA。予約への送客が本命。予約URLがなければ公式サイトへ */}
           <div className="flex flex-col gap-3 px-5">
-            <LinkButton href={`/plans/new?sauna=${sauna.slug}`} variant="primary" block>
-              <Icon name="Route" size={20} />
-              このサウナで休日を作る
-            </LinkButton>
+            {sauna.reservationUrl !== null ? (
+              <LinkButton href={sauna.reservationUrl} variant="primary" block external>
+                空き状況を見る・予約
+                <Icon name="ExternalLink" size={16} />
+              </LinkButton>
+            ) : sauna.officialUrl !== null ? (
+              <LinkButton href={sauna.officialUrl} variant="primary" block external>
+                公式サイトで見る
+                <Icon name="ExternalLink" size={16} />
+              </LinkButton>
+            ) : null}
             <FavoriteButton
               slug={sauna.slug}
               saunaId={sauna.id}
@@ -190,25 +211,25 @@ export default async function SaunaPage({ params, searchParams }: SaunaPageProps
             <LinkedPlaceList places={places} />
           </div>
 
-          {/* 予約は外部の公式ページへ。URLがなければ何も出さない */}
+          {/* 予約・公式サイトへの補助導線。主要CTAは上部にある */}
           <div className="flex flex-col gap-3 px-5">
-            {sauna.reservationUrl !== null ? (
-              <LinkButton href={sauna.reservationUrl} variant="secondary" block external>
-                公式サイトで予約
-                <Icon name="ExternalLink" size={16} />
-              </LinkButton>
-            ) : (
-              <p className="text-[13px] text-ink-faint">
-                予約ページの情報がありません。公式サイトをご確認ください。
-              </p>
-            )}
-
-            {sauna.officialUrl !== null ? (
+            {sauna.reservationUrl !== null && sauna.officialUrl !== null ? (
               <LinkButton href={sauna.officialUrl} variant="quiet" block external>
                 公式サイト
                 <Icon name="ExternalLink" size={16} />
               </LinkButton>
             ) : null}
+            {sauna.reservationUrl === null && sauna.officialUrl === null ? (
+              <p className="text-[13px] text-ink-faint">
+                予約・公式サイトの情報がありません。
+              </p>
+            ) : null}
+
+            {/* 翌日の過ごし方は補助機能として控えめに置く */}
+            <LinkButton href={`/plans/new?sauna=${sauna.slug}`} variant="quiet" block>
+              <Icon name="Route" size={16} />
+              泊まった翌日の過ごし方を見る
+            </LinkButton>
           </div>
         </div>
       </PageShell>

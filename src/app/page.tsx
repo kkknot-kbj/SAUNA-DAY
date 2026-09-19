@@ -14,8 +14,8 @@ type HomePageProps = {
 /**
  * 1. 探す（ホーム）
  *
- * メインコピーを最も目立つ要素として置き、1問1画面で条件を聞く。
- * 会員登録・ログインを要求しない。AIへの言及は一切置かない。
+ * サウナ付き一棟貸しの検索。メインコピーを最も目立つ要素として置き、
+ * 1問1画面で条件を聞く。会員登録・ログインを要求しない。AIへの言及は一切置かない。
  */
 export default async function HomePage({ searchParams }: HomePageProps) {
   const query = await searchParams;
@@ -33,9 +33,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <ConditionsProvider initial={initial}>
           <div className="flex flex-col gap-10">
             <h1 className="font-serif text-[30px] leading-[1.45] tracking-tight text-ink">
-              次の休日、
+              サウナで選ぶ、
               <br />
-              サウナから決めよう。
+              一棟貸しの休日。
             </h1>
 
             <StartFlow origins={origins} datePresets={datePresets} />

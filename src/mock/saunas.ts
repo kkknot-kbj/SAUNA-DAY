@@ -35,6 +35,7 @@ export const MOCK_SAUNAS: readonly MockSauna[] = [
     parkingNote: '河原沿いに5台',
     reservationUrl: 'https://example.com/okutama-kawabe/reserve',
     officialUrl: 'https://example.com/okutama-kawabe',
+    supportsDayTrip: true,
     popularityScore: 0.82,
     featuredUntil: '2026-09-30',
     featuredCopy: '渓流に飛び込む、夏の最高体験',
@@ -131,6 +132,8 @@ export const MOCK_SAUNAS: readonly MockSauna[] = [
     parkingNote: '3台（河川敷駐車場）',
     reservationUrl: 'https://example.com/tamagawa-kasenshiki/reserve',
     officialUrl: 'https://example.com/tamagawa-kasenshiki',
+    supportsDayTrip: true,
+    supportsLodging: false,
     popularityScore: 0.58,
     primaryTags: [tag('access', 'by_train'), tag('cooldown', 'river'), tag('sauna_type', 'tent')],
     features: [
