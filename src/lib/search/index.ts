@@ -14,7 +14,8 @@ import type {
 
 export { applyRequiredConditions, findExclusionReason } from './filter';
 export type { ExclusionReason } from './filter';
-export { rankResults } from './rank';
+export { rankResults, sortResults, isSortKey, SORT_LABELS } from './rank';
+export type { SortKey } from './rank';
 export { suggestRelaxations, SCARCE_RESULT_THRESHOLD } from './relax';
 export { buildScoringContext, calculateScore, NEUTRAL } from './score';
 export type { ScoringContext } from './score';

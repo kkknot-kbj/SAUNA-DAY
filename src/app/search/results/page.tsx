@@ -7,9 +7,13 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { LinkButton } from '@/components/ui/Button';
 import { Tag } from '@/components/ui/Tag';
+import { SortTabs } from '@/components/search/SortTabs';
 import { getRepository } from '@/lib/data';
+import { isSortKey, sortResults } from '@/lib/search';
 import { conditionsFromQuery, pathWithConditions } from '@/lib/state/conditions-url';
 import { iconOf, labelOf } from '@/lib/taxonomy/terms';
+
+import type { SortKey } from '@/lib/search';
 
 type ResultsPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -36,6 +40,11 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
 
   const backHref = pathWithConditions('/search/conditions', conditions);
   const mustTags = conditions.required.absoluteTags;
+
+  // ソート。?sort= が不正・未指定なら recommended
+  const sortParam = typeof query.sort === 'string' ? query.sort : '';
+  const sortKey: SortKey = isSortKey(sortParam) ? sortParam : 'recommended';
+  const sortedItems = sortResults(outcome.items, sortKey);
 
   return (
     <>
@@ -64,6 +73,9 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
                 ))}
               </div>
             ) : null}
+
+            {/* 並び替え。結果があるときだけ出す */}
+            {outcome.items.length > 0 ? <SortTabs active={sortKey} /> : null}
           </div>
 
           {/* 0件のときは必ず緩和提示を出す（要件9-5） */}
@@ -78,7 +90,7 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
             />
           ) : (
             <ul className="flex flex-col gap-12">
-              {outcome.items.map((item, index) => (
+              {sortedItems.map((item, index) => (
                 <li key={item.sauna.id} className="flex flex-col gap-2">
                   <SaunaCard
                     sauna={item.sauna}
@@ -86,7 +98,7 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
                     originLabel={originLabel}
                     priority={index === 0}
                   />
-                  {index === 0 && item.score.conditionMatch.matched.length > 0 ? (
+                  {index === 0 && sortKey === 'recommended' && item.score.conditionMatch.matched.length > 0 ? (
                     <p className="text-[13px] text-ink-muted">
                       {item.score.conditionMatch.matched
                         .slice(0, 3)

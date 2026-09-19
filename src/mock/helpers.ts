@@ -92,7 +92,8 @@ type SaunaInput = Pick<
  */
 export function defineSauna(input: SaunaInput): MockSauna {
   const alt = `${input.name}のサウナ棟と外気浴スペース`;
-  return {
+
+  const base: MockSauna = {
     description: null,
     area: null,
     address: null,
@@ -121,6 +122,27 @@ export function defineSauna(input: SaunaInput): MockSauna {
     coolTempMin: null,
     ...input,
   };
+
+  // カード表示用の導出値。最も冷たいクールダウンの水温
+  const coolTemps = base.cooldowns
+    .map((c) => c.waterTempMin)
+    .filter((t): t is number => t !== null);
+  base.coolTempMin = coolTemps.length === 0 ? null : Math.min(...coolTemps);
+
+  // 宿泊対応で lodging 未指定なら、汎用の宿泊情報を補完する。
+  // 個別に詳しい lodging を持つ施設はそのまま尊重する。
+  if (base.supportsLodging && base.lodging === null) {
+    base.lodging = lodging({
+      checkIn: '15:00',
+      checkOut: '10:00',
+      selfCheckIn: true,
+      maxGuests: base.capacityMax,
+      stayNote: '1泊〜',
+      amenityKeys: ['wifi', 'kitchen', 'fridge', 'aircon', 'parking', 'towel'],
+    });
+  }
+
+  return base;
 }
 
 /** よく使うアメニティの定義。key と lucide アイコンを対応させる */
