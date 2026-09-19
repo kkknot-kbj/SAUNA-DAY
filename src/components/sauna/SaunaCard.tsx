@@ -58,25 +58,27 @@ export function SaunaCard({ sauna, score, originLabel, priority = false }: Sauna
           {sauna.prefecture}{sauna.area !== null ? ` ${sauna.area}` : ''}
         </p>
 
-        {/* サウナ室温度・水風呂温度を一目で。参考: SaunaTrip のカード */}
-        {sauna.saunaTempMax !== null || sauna.coolTempMin !== null ? (
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-[13px] text-ink-muted">
-              <Icon name="Flame" size={16} className="text-ink-faint" />
-              サウナ
-              <span className="nums text-ink">
-                {sauna.saunaTempMax !== null ? `${sauna.saunaTempMax}℃` : UNKNOWN}
-              </span>
-            </span>
-            <span className="flex items-center gap-1.5 text-[13px] text-ink-muted">
-              <Icon name="Droplet" size={16} className="text-ink-faint" />
-              水風呂
-              <span className="nums text-ink">
-                {sauna.coolTempMin !== null ? `${sauna.coolTempMin}℃` : UNKNOWN}
-              </span>
-            </span>
-          </div>
-        ) : null}
+        {/* サウナ室温度・水風呂温度をバーで一目に。参考: SaunaTrip のカード */}
+        <div className="flex flex-col gap-2">
+          <CardTempBar
+            icon="Flame"
+            label="サウナ"
+            min={sauna.saunaTempMin}
+            max={sauna.saunaTempMax}
+            scaleMin={60}
+            scaleMax={120}
+            tone="hot"
+          />
+          <CardTempBar
+            icon="Droplet"
+            label="水風呂"
+            min={sauna.coolTempMin}
+            max={sauna.coolTempMax}
+            scaleMin={0}
+            scaleMax={30}
+            tone="cold"
+          />
+        </div>
 
         <TagRow items={tags} />
 
@@ -103,5 +105,61 @@ export function SaunaCard({ sauna, score, originLabel, priority = false }: Sauna
         </div>
       </div>
     </Link>
+  );
+}
+
+type CardTempBarProps = {
+  icon: string;
+  label: string;
+  min: number | null;
+  max: number | null;
+  scaleMin: number;
+  scaleMax: number;
+  tone: 'hot' | 'cold';
+};
+
+/** カード用のコンパクトな温度バー。ラベル + 帯 + 数値を1行に収める */
+function CardTempBar({ icon, label, min, max, scaleMin, scaleMax, tone }: CardTempBarProps) {
+  const known = min !== null || max !== null;
+  const clamp = (v: number) =>
+    Math.max(0, Math.min(100, ((v - scaleMin) / (scaleMax - scaleMin)) * 100));
+  const lo = min ?? max ?? 0;
+  const hi = max ?? min ?? 0;
+  const left = clamp(lo);
+  const width = Math.max(clamp(hi) - left, 3);
+
+  const rangeText =
+    !known
+      ? UNKNOWN
+      : min !== null && max !== null
+        ? min === max
+          ? `${min}℃`
+          : `${min}〜${max}℃`
+        : min !== null
+          ? `${min}℃〜`
+          : `〜${max}℃`;
+
+  const barColor = tone === 'hot' ? 'bg-accent' : 'bg-ink';
+
+  return (
+    <div className="flex items-center gap-2">
+      <Icon name={icon} size={16} className="shrink-0 text-ink-faint" />
+      <span className="w-10 shrink-0 text-[12px] text-ink-muted">{label}</span>
+      <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-line">
+        {known ? (
+          <span
+            className={`absolute inset-y-0 rounded-full ${barColor}`}
+            style={{ left: `${left}%`, width: `${width}%` }}
+          />
+        ) : null}
+      </span>
+      <span
+        className={
+          known ? 'nums w-16 shrink-0 text-right text-[12px] text-ink' : 'w-16 shrink-0 text-right text-[12px] text-ink-faint'
+        }
+      >
+        {rangeText}
+      </span>
+    </div>
   );
 }

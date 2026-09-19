@@ -46,17 +46,20 @@ function toSummary(sauna: SaunaDetail): SaunaSummary {
     travelMinutes: sauna.travelMinutes,
     featuredUntil: sauna.featuredUntil,
     featuredCopy: sauna.featuredCopy,
+    saunaTempMin: sauna.tempMin,
     saunaTempMax: sauna.tempMax,
-    coolTempMin: coldestCooldownTemp(sauna),
+    coolTempMin: coldestCooldown(sauna)?.waterTempMin ?? null,
+    coolTempMax: coldestCooldown(sauna)?.waterTempMax ?? null,
   };
 }
 
-/** 最も冷たいクールダウンの水温を返す。水温不明なら null */
-function coldestCooldownTemp(sauna: SaunaDetail): number | null {
-  const temps = sauna.cooldowns
-    .map((c) => c.waterTempMin)
-    .filter((t): t is number => t !== null);
-  return temps.length === 0 ? null : Math.min(...temps);
+/** 最も冷たいクールダウン（水温 min が最小）を返す。水温不明なら null */
+function coldestCooldown(sauna: SaunaDetail) {
+  const withTemp = sauna.cooldowns.filter((c) => c.waterTempMin !== null);
+  if (withTemp.length === 0) return null;
+  return withTemp.reduce((a, b) =>
+    (a.waterTempMin ?? Infinity) <= (b.waterTempMin ?? Infinity) ? a : b,
+  );
 }
 
 export const mockRepository: Repository = {

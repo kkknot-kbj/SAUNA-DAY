@@ -66,10 +66,14 @@ export type SaunaSummary = {
   featuredUntil: string | null;
   /** おすすめカード内のキャッチコピー */
   featuredCopy: string | null;
-  /** サウナ室温度（カードの一目表示用）。null は「不明」 */
+  /** サウナ室温度の下限（カード表示用）。null は「不明」 */
+  saunaTempMin: number | null;
+  /** サウナ室温度の上限（カード表示用）。null は「不明」 */
   saunaTempMax: number | null;
-  /** 主要なクールダウンの水温（カードの一目表示用）。null は「不明」 */
+  /** 主要クールダウンの水温下限（カード表示用）。null は「不明」 */
   coolTempMin: number | null;
+  /** 主要クールダウンの水温上限（カード表示用）。null は「不明」 */
+  coolTempMax: number | null;
 };
 
 /**

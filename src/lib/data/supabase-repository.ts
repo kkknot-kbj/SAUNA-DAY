@@ -136,17 +136,21 @@ function buildSaunaDetail(
     lodging: null,
     bbq: null,
     // カード表示用の導出値。toSummary で計算し直すため詳細では暫定値
+    saunaTempMin: row.temp_min,
     saunaTempMax: row.temp_max,
-    coolTempMin: cooldowns.map((c) => c.water_temp_min).filter((t): t is number => t !== null).length === 0
-      ? null
-      : Math.min(...cooldowns.map((c) => c.water_temp_min).filter((t): t is number => t !== null)),
+    coolTempMin: null,
+    coolTempMax: null,
   };
 }
 
 function toSummary(sauna: SaunaDetail): SaunaSummary {
-  const coolTemps = sauna.cooldowns
-    .map((c) => c.waterTempMin)
-    .filter((t): t is number => t !== null);
+  const withTemp = sauna.cooldowns.filter((c) => c.waterTempMin !== null);
+  const coldest =
+    withTemp.length === 0
+      ? null
+      : withTemp.reduce((a, b) =>
+          (a.waterTempMin ?? Infinity) <= (b.waterTempMin ?? Infinity) ? a : b,
+        );
 
   return {
     id: sauna.id,
@@ -160,8 +164,10 @@ function toSummary(sauna: SaunaDetail): SaunaSummary {
     travelMinutes: sauna.travelMinutes,
     featuredUntil: sauna.featuredUntil,
     featuredCopy: sauna.featuredCopy,
+    saunaTempMin: sauna.tempMin,
     saunaTempMax: sauna.tempMax,
-    coolTempMin: coolTemps.length === 0 ? null : Math.min(...coolTemps),
+    coolTempMin: coldest?.waterTempMin ?? null,
+    coolTempMax: coldest?.waterTempMax ?? null,
   };
 }
 

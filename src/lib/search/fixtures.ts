@@ -49,8 +49,10 @@ export function makeSauna(overrides: Partial<SaunaDetail> & { id: string }): Sau
     travelMinutes: null,
     featuredUntil: null,
     featuredCopy: null,
+    saunaTempMin: null,
     saunaTempMax: null,
     coolTempMin: null,
+    coolTempMax: null,
   };
 
   return { ...base, ...overrides };

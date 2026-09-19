@@ -118,16 +118,23 @@ export function defineSauna(input: SaunaInput): MockSauna {
     images: [{ url: null, alt }],
     featuredUntil: null,
     featuredCopy: null,
+    saunaTempMin: input.tempMin ?? null,
     saunaTempMax: input.tempMax ?? null,
     coolTempMin: null,
+    coolTempMax: null,
     ...input,
   };
 
-  // カード表示用の導出値。最も冷たいクールダウンの水温
-  const coolTemps = base.cooldowns
-    .map((c) => c.waterTempMin)
-    .filter((t): t is number => t !== null);
-  base.coolTempMin = coolTemps.length === 0 ? null : Math.min(...coolTemps);
+  // カード表示用の導出値。最も冷たいクールダウンの水温レンジ
+  const withTemp = base.cooldowns.filter((c) => c.waterTempMin !== null);
+  const coldest =
+    withTemp.length === 0
+      ? null
+      : withTemp.reduce((a, b) =>
+          (a.waterTempMin ?? Infinity) <= (b.waterTempMin ?? Infinity) ? a : b,
+        );
+  base.coolTempMin = coldest?.waterTempMin ?? null;
+  base.coolTempMax = coldest?.waterTempMax ?? null;
 
   // 宿泊対応で lodging 未指定なら、汎用の宿泊情報を補完する。
   // 個別に詳しい lodging を持つ施設はそのまま尊重する。
